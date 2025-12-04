@@ -1,5 +1,6 @@
 # Dark/Light Mode Next.js Setup
 
+## Eine moderne Next.js 16+ App mit voll funktionsfähigem Dark/Light Mode Toggle, erstellt mit Tailwind CSS 4+ und next-themes.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![JavaScript](https://img.shields.io/badge/JavaScript-✓-F7DF1E.svg?logo=javascript&logoColor=black)](https://developer.mozilla.org/de/docs/Web/JavaScript)  
 [![Next.js](https://img.shields.io/badge/Next.js-✓-000000.svg?logo=next.js)](https://nextjs.org/) [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-✓-06B6D4.svg?logo=tailwindcss)](https://tailwindcss.com/) [![React Icons](https://img.shields.io/badge/React_Icons-✓-E91E63.svg?logo=react)](https://react-icons.github.io/react-icons/) [![next-themes](https://img.shields.io/badge/next--themes-✓-000000.svg)](https://www.npmjs.com/package/next-themes)
