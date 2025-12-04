@@ -11,7 +11,9 @@
 **next-themes** [![npm version](https://img.shields.io/npm/v/next-themes.svg)](https://www.npmjs.com/package/next-themes)
 
 **Version in diesem Projekt:** `0.4.6`
+
 **npm-package:** [https://www.npmjs.com/package/next-themes](https://github.com/pacocoursey/next-themes)
+
 **repository:** [github.com/pacocoursey/next-themes](https://github.com/pacocoursey/next-themes)
 
 ---
