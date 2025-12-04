@@ -1,36 +1,242 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Dark/Light Mode Next.js Setup
 
-## Getting Started
 
-First, run the development server:
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![JavaScript](https://img.shields.io/badge/JavaScript-✓-F7DF1E.svg?logo=javascript&logoColor=black)](https://developer.mozilla.org/de/docs/Web/JavaScript)  
+[![Next.js](https://img.shields.io/badge/Next.js-✓-000000.svg?logo=next.js)](https://nextjs.org/) [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-✓-06B6D4.svg?logo=tailwindcss)](https://tailwindcss.com/) [![React Icons](https://img.shields.io/badge/React_Icons-✓-E91E63.svg?logo=react)](https://react-icons.github.io/react-icons/) [![next-themes](https://img.shields.io/badge/next--themes-✓-000000.svg)](https://www.npmjs.com/package/next-themes)
 
+## 📦 Paketinformation
+
+### **next-themes** - Theme Management für Next.js
+**next-themes** [![npm version](https://img.shields.io/npm/v/next-themes.svg)](https://www.npmjs.com/package/next-themes)
+
+**Version in diesem Projekt:** `0.4.6`
+**npm-package:** [https://www.npmjs.com/package/next-themes](https://github.com/pacocoursey/next-themes)
+**repository:** [github.com/pacocoursey/next-themes](https://github.com/pacocoursey/next-themes)
+
+---
+## Quick Start
+
+### 1️⃣ Projekt erstellen
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx create-next-app@latest [app-name]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2️⃣ In Projekt wechseln
+```bash
+cd [app-name]
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### 3️⃣ Abhängigkeiten installieren
+```bash
+npm install react-icons next-themes@0.4.6
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4️⃣ Server starten
+```bash
+npm run dev
+```
+→ Öffne [http://localhost:3000](http://localhost:3000)
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🎨 Dark/Light Mode Implementierung
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**⚠️ WICHTIG:** Diese Anleitung funktioniert spezifisch mit:
+- **Next.js 16+** 
+- **Tailwind CSS 4+**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Schritt 1: Ordnerstruktur vorbereiten
 
-## Deploy on Vercel
+```bash
+mkdir -p app/theme
+mkdir -p app/components
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Schritt 2: Theme Provider erstellen
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Erstelle `app/theme/providers.js`:
+
+```javascript
+// app/theme/providers.js
+'use client'
+
+import { ThemeProvider } from 'next-themes'
+
+export function Providers({ children }) {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="light">
+      {children}
+    </ThemeProvider>
+  )
+}
+```
+
+### Schritt 3: Theme-Toggle Komponente erstellen
+
+Erstelle `app/components/theme-toggle.js`:
+
+```javascript
+// app/components/theme-toggle.js
+'use client';
+
+import { IoSunnyOutline, IoMoonOutline } from "react-icons/io5";
+import { useTheme } from 'next-themes';
+
+export default function ThemeToggle() {
+  const { theme, setTheme, systemTheme } = useTheme();
+  
+  // Kein useEffect, kein mounted State!
+  // next-themes hat built-in loading
+  
+  // Wenn theme undefined (noch nicht geladen), nichts rendern
+  if (!theme) {
+    return (
+      <div className="p-2 text-3xl">
+        <div className="w-8 h-8 rounded-full bg-gray-300 animate-pulse"></div>
+      </div>
+    );
+  }
+
+  // Entscheide welches Icon angezeigt wird
+  const displayTheme = theme === 'system' ? systemTheme : theme;
+
+  return (
+    <button
+      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      className="p-2 text-3xl text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-cyan-500 duration-300 hover:cursor-pointer hover:scale-110 transition-transform"
+      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+    >
+      {displayTheme === 'dark' ? <IoSunnyOutline /> : <IoMoonOutline />}
+    </button>
+  );
+}
+```
+
+### Schritt 4: Globale CSS anpassen (Tailwind 4+ Syntax)
+
+In Tailwind CSS 4+ verwenden wir die `@variant` Syntax. Stelle sicher, dass `app/globals.css` Folgendes enthält:
+
+```css
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+```
+
+### Schritt 5: Layout Datei anpassen (Next.js 16+)
+
+**ACHTUNG Next.js 16+:** Wir verwenden direkt den `ThemeProvider` von `next-themes` im Layout:
+
+```javascript
+// app/layout.js
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import { ThemeProvider } from "next-themes";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata = {
+  title: "Create Next App",
+  description: "Generated by create next app",
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" suppressHydrationWarning> {/* KRITISCH für Next.js 16+ */}
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <ThemeProvider
+          attribute="class" {/* Setzt .dark Klasse auf html Element */}
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### Schritt 6: Theme-Toggle in der App verwenden
+
+Füge den Toggle in `app/page.js` ein:
+
+```javascript
+// app/page.js
+import ThemeToggle from './components/theme-toggle';
+
+export default function Home() {
+  return (
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white p-8">
+      <div className="flex justify-end mb-8">
+        <ThemeToggle />
+      </div>
+      
+      <h1 className="text-4xl font-bold mb-4">Dark/Light Mode Demo</h1>
+      <p className="text-lg">Next.js 16+ mit Tailwind CSS 4+</p>
+      
+      <div className="mt-8 p-6 bg-gray-100 dark:bg-gray-800 rounded-lg">
+        <h2 className="text-2xl font-semibold mb-2">Funktioniert!</h2>
+        <p>Dark Mode Klassen funktionieren mit der neuen Tailwind 4 Syntax.</p>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## ✅ Fertig!
+
+Deine App sollte jetzt:
+
+1. 🌓 Einen Theme-Toggle Button haben
+2. 🔄 Zwischen Dark und Light Mode wechseln
+3. 💾 Die Präferenz im Browser speichern
+4. 🚀 Ohne Hydration-Fehler laufen (kritisch für Next.js 16+)
+
+---
+
+## 🎯 Wichtige Punkte für Next.js 16+ & Tailwind 4+
+
+1. **`suppressHydrationWarning`** ist **ESSENTIELL** in Next.js 16+ 
+2. **Tailwind 4+** verwendet `@variant dark` statt `@tailwind base` etc.
+3. `ThemeProvider` mit `attribute="class"` ist die korrekte Methode
+4. Dark Mode Klassen: `dark:bg-gray-900`, `dark:text-white`, etc.
+5. `next-themes` 0.4.6 hat built-in Handling
+
+---
+
+## 🔧 Version-Check
+
+Überprüfe deine Versionen:
+```bash
+# Next.js Version
+npm list next
+
+# Tailwind CSS Version
+npm list tailwindcss
+
+# Sollte zeigen:
+# next@16.x.x
+# tailwindcss@4.x.x
+```
+
+---
+
+## 🚨 Fehlerbehebung
+
+**Hydration Error in Next.js 16:**
+- Sicherstellen, dass `suppressHydrationWarning` im `<html>` Tag steht
+- `next-themes@0.4.6` oder höher verwenden
+
+**Tailwind Dark Classes funktionieren nicht:**
+- Prüfe ob `@variant dark (&:where(.dark, .dark *));` in `globals.css` steht
+- Browser Cache leeren
+
+---
